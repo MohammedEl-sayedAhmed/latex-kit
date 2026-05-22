@@ -1,38 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="latex-kit logo">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1e1e2e"/>
-      <stop offset="1" stop-color="#11111b"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.65">
-      <stop offset="0" stop-color="#313244" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#11111b" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-
-  <rect width="256" height="256" rx="36" fill="url(#bg)"/>
-  <rect width="256" height="256" rx="36" fill="url(#glow)"/>
-  <rect x="6" y="6" width="244" height="244" rx="30" fill="none" stroke="#313244" stroke-width="1"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 90" role="img" aria-label="latex-kit logo">
+  <style>
+    .latex { fill: #1e1e2e; }
+    .kit   { fill: #4f7cd0; }
+    @media (prefers-color-scheme: dark) {
+      .latex { fill: #e6e6e6; }
+      .kit   { fill: #89b4fa; }
+    }
+  </style>
 
   <!-- LaTeX wordmark, classic logo positioning -->
-  <g font-family="'Latin Modern Roman','TeX Gyre Termes','STIX Two Text','Times New Roman',serif" fill="#cdd6f4">
-    <text x="38"  y="138" font-size="68">L</text>
-    <text x="74"  y="104" font-size="44">A</text>
-    <text x="104" y="138" font-size="68">T</text>
-    <text x="142" y="152" font-size="68">E</text>
-    <text x="180" y="138" font-size="68">X</text>
+  <g class="latex" font-family="'Latin Modern Roman','TeX Gyre Termes','STIX Two Text','Times New Roman',serif">
+    <text x="0"   y="70" font-size="72">L</text>
+    <text x="38"  y="34" font-size="46">A</text>
+    <text x="68"  y="70" font-size="72">T</text>
+    <text x="108" y="86" font-size="72">E</text>
+    <text x="148" y="70" font-size="72">X</text>
   </g>
 
-  <!-- Accent divider -->
-  <line x1="98" y1="168" x2="158" y2="168" stroke="#89b4fa" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+  <!-- divider dot -->
+  <circle cx="206" cy="50" r="2.4" class="kit" opacity="0.7"/>
 
-  <!-- kit subtitle, monospace -->
-  <text x="128" y="196" text-anchor="middle"
+  <!-- kit, monospace, accent color -->
+  <text x="222" y="68"
+        class="kit"
         font-family="'Fira Code','JetBrains Mono','DejaVu Sans Mono',monospace"
-        font-size="28" font-weight="600" letter-spacing="6" fill="#89b4fa">kit</text>
-
-  <!-- tagline -->
-  <text x="128" y="222" text-anchor="middle"
-        font-family="'Fira Code','JetBrains Mono',monospace"
-        font-size="11" letter-spacing="1" fill="#a6adc8">clone · build · ship</text>
+        font-size="50" font-weight="600" letter-spacing="2">kit</text>
 </svg>
