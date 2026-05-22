@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="latex-kit" width="200"/>
+</p>
+
 # latex-kit
 
 A clone-and-go LaTeX project. Same repo compiles three ways with **zero
