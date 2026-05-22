@@ -1,0 +1,31 @@
+name: Build PDF
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'assets/**', '.github/PULL_REQUEST_TEMPLATE.md']
+  pull_request:
+    paths-ignore: ['**.md', 'assets/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with TeX Live 2025-historic
+        run: |
+          docker run --rm -v "$PWD":/work -w /work \
+            texlive/texlive:TL2025-historic \
+            latexmk -pdf -interaction=nonstopmode -file-line-error main.tex
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-pdf
+          path: main.pdf
+          retention-days: 30
