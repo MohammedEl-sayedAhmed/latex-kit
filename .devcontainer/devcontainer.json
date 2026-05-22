@@ -1,0 +1,25 @@
+// LaTeX devcontainer — TeX Live 2025 (matches Overleaf).
+// Open this folder in VS Code with the "Dev Containers" extension installed,
+// then run "Dev Containers: Reopen in Container".
+{
+  "name": "LaTeX (TeX Live 2025)",
+  "image": "texlive/texlive:TL2025-historic",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "james-yu.latex-workshop"
+      ]
+    }
+  },
+
+  // Sanity-check the toolchain after the container is created.
+  "postCreateCommand": "latexmk --version && pdflatex --version | head -1",
+
+  // Keep file ownership predictable: the texlive image runs as root, so files
+  // created inside the container are root-owned on the host. We .gitignore
+  // build artifacts, so this only matters if you delete files from the host
+  // shell — do it from the container terminal instead. If this ever bites
+  // you, add a Dockerfile here that creates a non-root user.
+  "remoteUser": "root"
+}

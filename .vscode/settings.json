@@ -1,0 +1,11 @@
+{
+  "latex-workshop.latex.recipe.default": "latexmk (pdf)",
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.clean.subfolder.enabled": true,
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.synctex.afterBuild.enabled": true,
+  "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
+  "[latex]": {
+    "editor.wordWrap": "on"
+  }
+}

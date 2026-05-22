@@ -1,0 +1,29 @@
+## LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+
+## Auxiliary directories some flows produce
+build/
+out/
+
+## Editor / OS noise
+.DS_Store
+Thumbs.db
+
+## Keep the source PDF out of git history (uncomment if you do want to track it)
+*.pdf
