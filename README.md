@@ -141,3 +141,13 @@ These are baked in — keep them when you add files:
 - All `\input{...}` and `\includegraphics{...}` paths are relative to the root.
 - Custom `.cls` / `.sty` / fonts live inside the repo (Overleaf can't see outside).
 - No build scripts at compile time — anything beyond `latexmk` goes in `.latexmkrc`.
+
+## Contributing & security
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — branch + PR workflow, style notes.
+- [SECURITY.md](SECURITY.md) — how to report vulnerabilities privately.
+- Issue templates live in [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/).
+
+## License
+
+[MIT](LICENSE) © Mohammed El-sayed Ahmed
