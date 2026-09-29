@@ -1,0 +1,4 @@
+# TeX Live Docker image for scripts/tex and scripts/setup: the first
+# non-comment line, as a tag or tag@digest.
+# Keep in sync with .devcontainer/devcontainer.json and .github/workflows/.
+texlive/texlive:TL2025-historic

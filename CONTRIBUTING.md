@@ -4,8 +4,9 @@ Thanks for your interest. Quick notes on how the template is maintained.
 
 ## Setup
 
-Follow whichever of the three paths in [README.md](README.md) fits you:
-**Devcontainer (A)**, **native TeX Live (B)**, or **Overleaf upload (C)**.
+Follow whichever of the four paths in [README.md](README.md) fits you:
+**Devcontainer (A)**, **native TeX Live (B)**, **Overleaf upload (C)**, or
+**Docker from the host (D)**.
 
 Devcontainer is the smoothest for one-off PRs — no host install needed.
 

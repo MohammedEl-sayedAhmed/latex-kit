@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Run a TeX command in the TeX Live Docker image named in .texlive-image, so
+# no local TeX install is needed. `make` and VS Code build through this script.
+#
+#   scripts/tex latexmk main.tex    # run from the folder holding the .tex
+#   scripts/tex pdflatex --version
+#
+# The repo is mounted at its host path, so \input{../...} and SyncTeX paths
+# resolve, and the command runs as you (build files aren't root-owned) with no
+# network access.
+#
+#   TEX_NATIVE=1     run the command with a local TeX Live instead of Docker
+#                    (the devcontainer sets this); without Docker, a local
+#                    command is used anyway, with a notice
+#   TEX_IMAGE=<ref>  use another image for one run
+#
+# Part of latex-kit (https://github.com/MohammedEl-sayedAhmed/latex-kit).
+# Repos built from it carry an identical copy; per-repo settings go in
+# .texlive-image.
+
+set -euo pipefail
+
+if [[ ${TEX_NATIVE:-} == 1 ]]; then
+  exec "$@"
+fi
+if ! command -v docker >/dev/null; then
+  if command -v "$1" >/dev/null; then
+    echo "scripts/tex: docker not found, using local $1 (set TEX_NATIVE=1 to silence this)" >&2
+    exec "$@"
+  fi
+  echo "scripts/tex: docker not found. Run scripts/setup, or install TeX Live and set TEX_NATIVE=1." >&2
+  exit 1
+fi
+
+# Physical paths on both sides, so a symlinked checkout still matches.
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
+here=$(pwd -P)
+case $here in
+  "$root" | "$root"/*) ;;
+  *) echo "scripts/tex: run from inside $root (current dir: $here)" >&2; exit 1 ;;
+esac
+
+# First non-comment, non-blank line of .texlive-image.
+image=${TEX_IMAGE:-$(sed -n -e 's/#.*//' -e 's/[[:space:]]//g' -e '/./{p;q;}' "$root/.texlive-image")}
+
+# Rootful Docker needs --user to avoid root-owned files; rootless Docker
+# already maps container root to you, and --user would break writes.
+user=(--user "$(id -u):$(id -g)")
+if docker info --format '{{.SecurityOptions}}' 2>/dev/null | grep rootless >/dev/null; then
+  user=()
+fi
+
+exec docker run --rm -i --network none \
+  "${user[@]}" -e HOME=/tmp \
+  -v "$root:$root" -w "$here" \
+  "$image" "$@"
