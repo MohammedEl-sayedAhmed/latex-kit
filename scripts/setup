@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# One-time machine setup for building this repo. Checks each prerequisite and
+# installs what's missing, asking before anything that needs sudo.
+#
+#   scripts/setup           # check and install
+#   scripts/setup --check   # report only; exits 1 if anything is missing
+#
+# Checks: make, Docker (usable without sudo), the TeX Live image named in
+# .texlive-image, and the LaTeX Workshop extension if VS Code is installed.
+# With TEX_NATIVE=1 it checks for a local latexmk instead of Docker.
+# Installs use apt (Debian/Ubuntu); elsewhere it says what to install.
+#
+# Part of latex-kit (https://github.com/MohammedEl-sayedAhmed/latex-kit).
+# Repos built from it carry an identical copy; per-repo settings go in
+# .texlive-image.
+
+set -euo pipefail
+
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+image=$(sed -n -e 's/#.*//' -e 's/[[:space:]]//g' -e '/./{p;q;}' "$root/.texlive-image")
+
+check_only=0
+case ${1:-} in
+  "") ;;
+  --check) check_only=1 ;;
+  *) echo "usage: scripts/setup [--check]" >&2; exit 2 ;;
+esac
+
+missing=0
+ok()   { printf '  ok       %s\n' "$*"; }
+todo() { printf '  MISSING  %s\n' "$*"; missing=1; }
+
+# Ask a yes/no question; "no" when there's no terminal to answer from.
+confirm() {
+  local reply
+  [[ -t 0 ]] || return 1
+  read -r -p "  $1 [Y/n] " reply
+  [[ -z $reply || $reply == [Yy]* ]]
+}
+
+# need_pkg <command> <apt package>: ok if <command> exists, else offer to install.
+need_pkg() {
+  if command -v "$1" >/dev/null; then ok "$1"; return; fi
+  if ((!check_only)); then
+    if ! command -v apt-get >/dev/null; then
+      echo "  no apt-get here; install '$2' with your package manager" >&2
+    elif confirm "Install $2 with sudo apt-get?"; then
+      sudo apt-get update -qq && sudo apt-get install -y "$2"
+    fi
+  fi
+  if command -v "$1" >/dev/null; then ok "$1 (installed)"; else todo "$1 (apt package: $2)"; fi
+}
+
+echo "Checking build prerequisites for $root"
+
+need_pkg make make
+
+if [[ ${TEX_NATIVE:-} == 1 ]]; then
+  if command -v latexmk >/dev/null; then
+    ok "latexmk (local TeX Live, TEX_NATIVE=1)"
+  else
+    todo "latexmk: install TeX Live, or unset TEX_NATIVE to build with Docker"
+  fi
+else
+  need_pkg docker docker.io
+
+  if command -v docker >/dev/null; then
+    if docker info >/dev/null 2>&1; then
+      ok "Docker usable without sudo"
+    elif id -nG | grep -w docker >/dev/null; then
+      todo "Docker daemon not reachable; start it with: sudo systemctl start docker"
+    else
+      if ((!check_only)) && confirm "Add $USER to the docker group (sudo)?"; then
+        sudo usermod -aG docker "$USER"
+        echo "  Log out and back in for the group change to apply, then re-run scripts/setup."
+      fi
+      todo "Docker usable without sudo ($USER is not in the docker group)"
+    fi
+
+    if docker image inspect "$image" >/dev/null 2>&1; then
+      ok "TeX Live image $image"
+    elif ((!check_only)) && docker info >/dev/null 2>&1; then
+      echo "  Pulling $image (one-time, a few GB)..."
+      if docker pull "$image"; then ok "TeX Live image $image (pulled)"; else todo "TeX Live image $image"; fi
+    else
+      todo "TeX Live image $image"
+    fi
+  fi
+fi
+
+if ((!missing)); then
+  if version=$(cd "$root" && scripts/tex pdflatex --version 2>&1 | sed -n 1p); then
+    ok "TeX runs: $version"
+  else
+    todo "TeX smoke test failed: $version"
+  fi
+fi
+
+if command -v code >/dev/null; then
+  if code --list-extensions 2>/dev/null | grep -ix james-yu.latex-workshop >/dev/null; then
+    ok "VS Code: LaTeX Workshop"
+  elif ((!check_only)) && code --install-extension james-yu.latex-workshop >/dev/null; then
+    ok "VS Code: LaTeX Workshop (installed)"
+  else
+    todo "VS Code: LaTeX Workshop extension (code --install-extension james-yu.latex-workshop)"
+  fi
+else
+  echo "  skip     VS Code not found (optional)"
+fi
+
+if ((missing)); then
+  echo "Some prerequisites are missing (see above)."
+  exit 1
+fi
+echo "All set. Build with make (see README)."

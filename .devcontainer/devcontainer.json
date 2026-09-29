@@ -13,6 +13,12 @@
     }
   },
 
+  // TeX is installed in this image, so scripts/tex (used by VS Code builds and
+  // the Makefile) runs commands directly instead of starting another container.
+  "containerEnv": {
+    "TEX_NATIVE": "1"
+  },
+
   // Sanity-check the toolchain after the container is created.
   "postCreateCommand": "latexmk --version && pdflatex --version | head -1",
 

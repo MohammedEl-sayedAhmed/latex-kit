@@ -25,7 +25,7 @@ Steps to reproduce the behavior:
 ## Environment
 
 - OS:
-- Path used (A devcontainer / B native / C Overleaf):
+- Path used (A devcontainer / B native / C Overleaf / D Docker from host):
 - TeX Live version (if native):
 - VS Code version (if applicable):
 

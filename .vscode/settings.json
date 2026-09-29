@@ -1,5 +1,27 @@
 {
-  "latex-workshop.latex.recipe.default": "latexmk (pdf)",
+  // Builds go through scripts/tex: the Docker image in .texlive-image by
+  // default, a local TeX Live when TEX_NATIVE=1 (the devcontainer sets it;
+  // Path B adds it to ~/.profile). No -pdf flag, so .latexmkrc picks the
+  // engine. LaTeX Workshop only expands placeholders in args, hence
+  // `bash <script>` rather than the script as the command.
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk (scripts/tex)",
+      "command": "bash",
+      "args": [
+        "%WORKSPACE_FOLDER%/scripts/tex",
+        "latexmk",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOCFILE_EXT%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    { "name": "latexmk (.latexmkrc)", "tools": ["latexmk (scripts/tex)"] }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
   "latex-workshop.latex.autoBuild.run": "onSave",
   "latex-workshop.latex.clean.subfolder.enabled": true,
   "latex-workshop.view.pdf.viewer": "tab",

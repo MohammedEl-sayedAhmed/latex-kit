@@ -4,8 +4,9 @@
 
 # latex-kit
 
-A clone-and-go LaTeX project. Same repo compiles three ways with **zero
-changes**: locally, inside a Docker devcontainer, and on Overleaf.
+A clone-and-go LaTeX project. Same repo compiles four ways with **zero
+changes**: inside a Docker devcontainer, with a native TeX Live, on Overleaf,
+and with Docker from the host.
 
 ## Start a new project
 
@@ -48,6 +49,7 @@ cd /tmp && wget "$HISTORIC/install-tl-unx.tar.gz"
 tar -xzf install-tl-unx.tar.gz && cd install-tl-*/
 perl ./install-tl --no-interaction --scheme=full -repository "$HISTORIC"
 echo 'export PATH="$HOME/texlive/2025/bin/x86_64-linux:$PATH"' >> ~/.profile
+echo 'export TEX_NATIVE=1' >> ~/.profile   # scripts/tex (VS Code, make) uses this TeX Live, not Docker
 # Log out + back in.
 code --install-extension James-Yu.latex-workshop
 ```
@@ -75,7 +77,38 @@ It auto-detects `main.tex` and the `.latexmkrc`.
 
 ---
 
-## VS Code shortcuts (Paths A & B)
+## Path D — Docker from the host (no TeX install, no container editor)
+
+For a machine with Docker where you'd rather not install TeX Live or run VS
+Code inside a container. `make` and VS Code stay on the host, and every TeX
+command runs in the image named in `.texlive-image` through `scripts/tex`, as
+your user (no root-owned files).
+
+**One-time per machine** (Debian/Ubuntu):
+
+```bash
+./scripts/setup
+```
+
+It checks for and installs what's missing: `make`, Docker (usable without
+sudo), the TeX Live image (~2.6 GB), and the LaTeX Workshop extension if VS
+Code is installed. It asks before anything that needs sudo;
+`./scripts/setup --check` only reports.
+
+**Per project:**
+
+```bash
+make             # build main.pdf (engine and options come from .latexmkrc)
+make clean       # remove aux files, keep the PDF
+code .           # Ctrl+Alt+B builds through the same image
+```
+
+Other repos can use the same setup: copy `scripts/tex`, `scripts/setup` and
+`.texlive-image` unchanged, and put that repo's image in `.texlive-image`.
+
+---
+
+## VS Code shortcuts (Paths A, B & D)
 
 | Shortcut | Action |
 |---|---|
@@ -95,6 +128,9 @@ latexmk -c                # remove aux files (keep PDF)
 latexmk -C                # remove everything except sources
 ```
 
+Path D runs the same commands through Docker: `make`, `make clean`,
+`make distclean`, or any TeX command as `scripts/tex <command>`.
+
 ## Layout
 
 ```
@@ -105,12 +141,14 @@ sections/                # \input{}-ed parts of main.tex
 figures/                 # images for \includegraphics{...}
 references.bib           # bibliography (commented-out in main.tex)
 .latexmkrc               # build config (honored locally + on Overleaf)
+Makefile                 # make / make clean via scripts/tex (Path D)
+.texlive-image           # TeX Live image scripts/tex runs (Path D)
 .devcontainer/           # Docker image config (Path A)
 .vscode/                 # editor settings + recommended extensions
 .github/                 # CI workflows + PR template + Dependabot
 .gitignore               # ignores *.aux, *.log, *.pdf, etc.
 assets/logo.svg          # repo logo (embedded at top of README)
-scripts/                 # one-off helpers (e.g. demo GIF generator)
+scripts/                 # setup + tex (Path D), demo GIF helper
 ```
 
 ## CI / CD (GitHub Actions)

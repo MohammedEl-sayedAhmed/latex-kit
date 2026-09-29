@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Run a TeX command in the TeX Live Docker image named in .texlive-image, so
+# no local TeX install is needed. `make` and VS Code build through this script.
+#
+#   scripts/tex latexmk main.tex    # run from the folder holding the .tex
+#   scripts/tex pdflatex --version
+#
+# The repo is mounted at its host path, so \input{../...} and SyncTeX paths
+# resolve, and the command runs as you (build files aren't root-owned) with no
+# network access.
+#
+#   TEX_NATIVE=1     run the command with a local TeX Live instead of Docker
+#                    (the devcontainer sets this)
+#   TEX_IMAGE=<ref>  use another image for one run
+#
+# Part of latex-kit (https://github.com/MohammedEl-sayedAhmed/latex-kit).
+# Repos built from it carry an identical copy; per-repo settings go in
+# .texlive-image.
+
+set -euo pipefail
+
+if [[ ${TEX_NATIVE:-} == 1 ]]; then
+  exec "$@"
+fi
+
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+case $PWD in
+  "$root" | "$root"/*) ;;
+  *) echo "scripts/tex: run from inside $root (current dir: $PWD)" >&2; exit 1 ;;
+esac
+if ! command -v docker >/dev/null; then
+  echo "scripts/tex: docker not found. Run scripts/setup, or set TEX_NATIVE=1 to use a local TeX Live." >&2
+  exit 1
+fi
+
+# First non-comment, non-blank line of .texlive-image.
+image=${TEX_IMAGE:-$(sed -n -e 's/#.*//' -e 's/[[:space:]]//g' -e '/./{p;q;}' "$root/.texlive-image")}
+
+exec docker run --rm -i --network none \
+  --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -v "$root:$root" -w "$PWD" \
+  "$image" "$@"
