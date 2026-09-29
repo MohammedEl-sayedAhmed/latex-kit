@@ -45,7 +45,8 @@ need_pkg() {
     if ! command -v apt-get >/dev/null; then
       echo "  no apt-get here; install '$2' with your package manager" >&2
     elif confirm "Install $2 with sudo apt-get?"; then
-      sudo apt-get update -qq && sudo apt-get install -y "$2"
+      # A failed install is reported just below rather than aborting setup.
+      { sudo apt-get update -qq && sudo apt-get install -y "$2"; } || true
     fi
   fi
   if command -v "$1" >/dev/null; then ok "$1 (installed)"; else todo "$1 (apt package: $2)"; fi
@@ -70,8 +71,8 @@ else
     elif id -nG | grep -w docker >/dev/null; then
       todo "Docker daemon not reachable; start it with: sudo systemctl start docker"
     else
-      if ((!check_only)) && confirm "Add $USER to the docker group (sudo)?"; then
-        sudo usermod -aG docker "$USER"
+      if ((!check_only)) && confirm "Add $USER to the docker group (sudo)?" &&
+         sudo usermod -aG docker "$USER"; then
         echo "  Log out and back in for the group change to apply, then re-run scripts/setup."
       fi
       todo "Docker usable without sudo ($USER is not in the docker group)"
@@ -89,10 +90,12 @@ else
 fi
 
 if ((!missing)); then
-  if version=$(cd "$root" && scripts/tex pdflatex --version 2>&1 | sed -n 1p); then
-    ok "TeX runs: $version"
-  else
+  if ! version=$(cd "$root" && scripts/tex pdflatex --version 2>&1 | sed -n 1p); then
     todo "TeX smoke test failed: $version"
+  elif ! (cd "$root" && scripts/tex sh -c ': > .setup-write-test && rm .setup-write-test') >/dev/null 2>&1; then
+    todo "TeX runs but can't write build files into $root (Docker user mapping?)"
+  else
+    ok "TeX runs and can write build files: $version"
   fi
 fi
 
