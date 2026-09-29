@@ -64,11 +64,12 @@ Click the red dot in the top status bar. The recording auto-saves to
 ```bash
 cd ~/Repos/latex-kit
 
-# Glob picks up the most recent screencast; quote the path if needed
-./scripts/make-demo-gif.sh ~/Videos/Screencasts/Screencast\ from*.webm
+# Newest recording (a bare glob would pass every match as arguments)
+latest=$(ls -t ~/Videos/Screencasts/*.webm | head -n 1)
+./scripts/make-demo-gif.sh "$latest"
 
-# Or pass an explicit path:
-# ./scripts/make-demo-gif.sh "~/Videos/Screencasts/Screencast from 2026-05-23.webm" assets/demo.gif 900
+# Or pass an explicit path (use $HOME: ~ doesn't expand inside quotes):
+# ./scripts/make-demo-gif.sh "$HOME/Videos/Screencasts/Screencast from 2026-05-23.webm" assets/demo.gif 900
 ```
 
 The script does a two-pass `ffmpeg` palette-generation, drops fps to 12,
