@@ -17,16 +17,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: Build with TeX Live 2025-historic
-        run: |
-          docker run --rm -v "$PWD":/work -w /work \
-            texlive/texlive:TL2025-historic \
-            latexmk -pdf -interaction=nonstopmode -file-line-error main.tex
+      # Same path as `make`: the image pinned in .texlive-image, engine and
+      # options from .latexmkrc.
+      - name: Build with the pinned TeX Live image
+        run: scripts/tex latexmk
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: main-pdf
           path: main.pdf
+          retention-days: 30
+
+      - name: Upload log on failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: main-log
+          path: main.log
+          if-no-files-found: ignore
           retention-days: 30

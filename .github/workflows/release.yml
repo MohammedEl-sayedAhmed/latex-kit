@@ -15,20 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: Build with TeX Live 2025-historic
-        run: |
-          docker run --rm -v "$PWD":/work -w /work \
-            texlive/texlive:TL2025-historic \
-            latexmk -pdf -interaction=nonstopmode -file-line-error main.tex
+      - name: Build with the pinned TeX Live image
+        run: scripts/tex latexmk
 
+      # The tag name reaches the shell through env, never pasted into the
+      # script text, so an odd tag name can't inject commands.
       - name: Rename PDF with tag
-        run: mv main.pdf "main-${{ github.ref_name }}.pdf"
+        env:
+          TAG: ${{ github.ref_name }}
+        run: mv main.pdf "main-$TAG.pdf"
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${{ github.ref_name }}" \
-            "main-${{ github.ref_name }}.pdf" \
-            --generate-notes
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" "main-$TAG.pdf" --generate-notes

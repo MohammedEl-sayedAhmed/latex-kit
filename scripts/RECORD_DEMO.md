@@ -10,8 +10,8 @@ VS Code with the *Dev Containers* extension.
 ## 1. Prep (do once, before recording)
 
 ```bash
-# Pre-pull the texlive image so the recording skips the 5-min download
-docker pull texlive/texlive:TL2025-historic
+# Pre-pull the pinned texlive image so the recording skips the download
+(cd ~/Repos/latex-kit && ./scripts/setup)
 
 # Wipe any leftover demo clone so the recording shows a fresh `git clone`
 rm -rf ~/Repos/latex-kit-demo

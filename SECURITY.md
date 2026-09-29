@@ -18,8 +18,8 @@ template state.
 
 ## Scope
 
-In-scope: the workflow files, the devcontainer config, the Dockerfile
-references, and any helper scripts under `scripts/`.
+In-scope: the workflow files, the devcontainer config, the TeX Live image
+pin (`.texlive-image`), and the helper scripts under `scripts/`.
 
 Out-of-scope: vulnerabilities in upstream dependencies (TeX Live, LaTeX
 packages, Docker base images, GitHub Actions). Please report those to
