@@ -41,13 +41,14 @@ to view the PDF.
 
 **One-time per machine** (Linux). Installs TeX Live 2025-historic — same
 release as the devcontainer and Overleaf, so all three paths produce
-byte-identical PDFs:
+byte-identical PDFs. It goes into `~/texlive/2025`, so no sudo is needed
+(`--scheme=full` needs ~9.4 GB):
 
 ```bash
 HISTORIC=https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final
 cd /tmp && wget "$HISTORIC/install-tl-unx.tar.gz"
 tar -xzf install-tl-unx.tar.gz && cd install-tl-*/
-perl ./install-tl --no-interaction --scheme=full -repository "$HISTORIC"
+perl ./install-tl --no-interaction --scheme=full -repository "$HISTORIC" -texdir "$HOME/texlive/2025"
 echo 'export PATH="$HOME/texlive/2025/bin/x86_64-linux:$PATH"' >> ~/.profile
 echo 'export TEX_NATIVE=1' >> ~/.profile   # scripts/tex (VS Code, make) uses this TeX Live, not Docker
 # Log out + back in.
@@ -69,7 +70,7 @@ latexmk -pdf main.tex
 ## Path C — Overleaf (browser, no install)
 
 ```bash
-zip -r project.zip . -x ".git/*" ".vscode/*" ".devcontainer/*" "*.aux" "*.log" "*.fls" "*.fdb_latexmk" "*.out" "*.synctex.gz" "*.toc" "*.pdf"
+zip -r project.zip . -x ".git/*" ".vscode/*" ".devcontainer/*" "*.aux" "*.log" "*.fls" "*.fdb_latexmk" "*.out" "*.synctex.gz" "*.toc" "main.pdf"
 ```
 
 Overleaf web → **New Project → Upload Project →** drop `project.zip`.
@@ -146,7 +147,7 @@ Makefile                 # make / make clean via scripts/tex (Path D)
 .devcontainer/           # Docker image config (Path A)
 .vscode/                 # editor settings + recommended extensions
 .github/                 # CI workflows + PR template + Dependabot
-.gitignore               # ignores *.aux, *.log, *.pdf, etc.
+.gitignore               # ignores *.aux, *.log, the built main.pdf, etc.
 assets/logo.svg          # repo logo (embedded at top of README)
 scripts/                 # setup + tex (Path D), demo GIF helper
 ```
@@ -158,7 +159,7 @@ repo is pushed to GitHub:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| **Build PDF** | every push to `main`, every PR | Compiles `main.tex` inside `texlive/texlive:TL2025-historic`. Uploads `main.pdf` as a workflow artifact (download from the Actions tab). |
+| **Build PDF** | every PR; pushes to `main` except docs-only (`*.md`, `assets/`) | Compiles `main.tex` inside `texlive/texlive:TL2025-historic`. Uploads `main.pdf` as a workflow artifact (download from the Actions tab). |
 | **Release PDF** | tag `v*` (e.g. `git tag v1.0 && git push --tags`) | Builds and publishes a GitHub Release named after the tag, with the PDF attached. |
 | **Lint LaTeX** | every PR touching `*.tex` | Runs `chktex` over all `.tex` files. Advisory — never blocks merging. |
 
