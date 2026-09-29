@@ -16,9 +16,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Run chktex on every .tex file
-        run: |
-          docker run --rm -v "$PWD":/work -w /work \
-            texlive/texlive:TL2025-historic \
-            sh -c 'find . -name "*.tex" -not -path "./.git/*" -print0 | xargs -0 chktex -q'
+        run: scripts/tex sh -c 'find . -name "*.tex" -not -path "./.git/*" -print0 | xargs -0 chktex -q'

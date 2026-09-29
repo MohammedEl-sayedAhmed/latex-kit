@@ -3,7 +3,7 @@
 // then run "Dev Containers: Reopen in Container".
 {
   "name": "LaTeX (TeX Live 2025)",
-  "image": "texlive/texlive:TL2025-historic",
+  "image": "texlive/texlive:TL2025-historic@sha256:f25ee2dcd00f58198f918064f4a1c8562410b33e84155bd55b02b419d73d9391",
 
   "customizations": {
     "vscode": {

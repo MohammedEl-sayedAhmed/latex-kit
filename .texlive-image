@@ -1,4 +1,5 @@
-# TeX Live Docker image for scripts/tex and scripts/setup: the first
-# non-comment line, as a tag or tag@digest.
-# Keep in sync with .devcontainer/devcontainer.json and .github/workflows/.
-texlive/texlive:TL2025-historic
+# TeX Live Docker image for scripts/tex (so also make, VS Code and CI) and
+# scripts/setup: the first non-comment line, as a tag or tag@digest.
+# Pinned by digest so every build uses identical packages; the tag says which
+# release it is. Keep in sync with .devcontainer/devcontainer.json.
+texlive/texlive:TL2025-historic@sha256:f25ee2dcd00f58198f918064f4a1c8562410b33e84155bd55b02b419d73d9391
