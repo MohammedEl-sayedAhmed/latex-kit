@@ -25,5 +25,6 @@ out/
 .DS_Store
 Thumbs.db
 
-## Keep the source PDF out of git history (uncomment if you do want to track it)
-*.pdf
+## Keep the built PDF out of git history (delete this line to track it).
+## Only the root main.pdf: PDFs elsewhere, like figures/*.pdf, are sources.
+/main.pdf

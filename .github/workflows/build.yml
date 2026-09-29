@@ -3,9 +3,10 @@ name: Build PDF
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'assets/**', '.github/PULL_REQUEST_TEMPLATE.md']
-  pull_request:
     paths-ignore: ['**.md', 'assets/**']
+  # No path filter on PRs: `build` is a required check, and a skipped workflow
+  # never reports, which would leave docs-only PRs waiting forever.
+  pull_request:
   workflow_dispatch:
 
 permissions:
