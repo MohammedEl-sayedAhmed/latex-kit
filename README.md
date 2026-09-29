@@ -13,6 +13,22 @@ and with Docker from the host.
 Click **"Use this template"** on GitHub, name your repo, clone it, and pick
 one path below.
 
+**Then make it yours.** Some files describe latex-kit itself, not your
+document:
+
+- `SECURITY.md`, `CONTRIBUTING.md`, `.github/ISSUE_TEMPLATE/` point people at
+  the latex-kit repo.
+- `scripts/RECORD_DEMO.md`, `scripts/make-demo-gif.sh` and `assets/` are
+  latex-kit's README demo and logo.
+- `LICENSE` is MIT under the template author's name. Replace it with your
+  document's license, or delete it.
+- `README.md` is this page. Replace it with your own.
+
+```bash
+git rm -r SECURITY.md CONTRIBUTING.md .github/ISSUE_TEMPLATE \
+  scripts/RECORD_DEMO.md scripts/make-demo-gif.sh assets
+```
+
 ---
 
 ## Path A — Devcontainer (no host TeX install needed)
@@ -31,7 +47,7 @@ code .
 ```
 
 VS Code shows *"Reopen in Container"* — click it. First run pulls the
-`texlive/texlive:TL2025-historic` image (~1.5 GB, cached for all future
+`texlive/texlive:TL2025-historic` image (~2.6 GB, cached for all future
 projects). Open `main.tex`, press **Ctrl+Alt+B** to build, **Ctrl+Alt+V**
 to view the PDF.
 
@@ -39,9 +55,10 @@ to view the PDF.
 
 ## Path B — Native local install (faster builds, full offline)
 
-**One-time per machine** (Linux). Installs TeX Live 2025-historic — same
-release as the devcontainer and Overleaf, so all three paths produce
-byte-identical PDFs. It goes into `~/texlive/2025`, so no sudo is needed
+**One-time per machine** (Linux). Installs TeX Live 2025-historic — the
+release the devcontainer, Path D and CI use, and the TeX Live year Overleaf
+offers — so documents lay out the same on every path (the PDF files still
+differ in their embedded build dates). It goes into `~/texlive/2025`, so no sudo is needed
 (`--scheme=full` needs ~9.4 GB):
 
 ```bash
@@ -143,7 +160,7 @@ figures/                 # images for \includegraphics{...}
 references.bib           # bibliography (commented-out in main.tex)
 .latexmkrc               # build config (honored locally + on Overleaf)
 Makefile                 # make / make clean via scripts/tex (Path D)
-.texlive-image           # TeX Live image scripts/tex runs (Path D)
+.texlive-image           # TeX Live image, pinned by digest (Path D + CI)
 .devcontainer/           # Docker image config (Path A)
 .vscode/                 # editor settings + recommended extensions
 .github/                 # CI workflows + PR template + Dependabot
@@ -159,7 +176,7 @@ repo is pushed to GitHub:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| **Build PDF** | every PR; pushes to `main` except docs-only (`*.md`, `assets/`) | Compiles `main.tex` inside `texlive/texlive:TL2025-historic`. Uploads `main.pdf` as a workflow artifact (download from the Actions tab). |
+| **Build PDF** | every PR; pushes to `main` except docs-only (`*.md`, `assets/`) | Compiles `main.tex` through `scripts/tex` in the image pinned in `.texlive-image` (TL2025-historic). Uploads `main.pdf` as a workflow artifact (download from the Actions tab), or `main.log` if the build fails. |
 | **Release PDF** | tag `v*` (e.g. `git tag v1.0 && git push --tags`) | Builds and publishes a GitHub Release named after the tag, with the PDF attached. |
 | **Lint LaTeX** | every PR touching `*.tex` | Runs `chktex` over all `.tex` files. Advisory — never blocks merging. |
 
