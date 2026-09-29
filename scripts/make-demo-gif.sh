@@ -19,6 +19,11 @@ in=$1
 out=${2:-assets/demo.gif}
 w=${3:-900}
 
+if [ ! -f "$in" ]; then
+  echo "input recording not found: '$in'" >&2
+  exit 1
+fi
+
 # An unquoted glob that matches several recordings shifts the second one into
 # [output], where ffmpeg -y would overwrite it. Only ever write a .gif.
 case $out in
